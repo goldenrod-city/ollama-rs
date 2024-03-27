@@ -5,12 +5,12 @@ pub mod models;
 #[derive(Debug, Clone)]
 pub struct Ollama {
     pub(crate) host: String,
-    pub(crate) port: u16,
+    pub(crate) port: Option<u16>,
     pub(crate) reqwest_client: reqwest::Client,
 }
 
 impl Ollama {
-    pub fn new(host: String, port: u16) -> Self {
+    pub fn new(host: String, port: Option<u16>) -> Self {
         Self {
             host,
             port,
@@ -20,7 +20,11 @@ impl Ollama {
 
     /// Returns the http URI of the Ollama instance
     pub fn uri(&self) -> String {
-        format!("{}:{}", self.host, self.port)
+        if let Some(port) = self.port {
+            format!("{}:{}", self.host, port)
+        } else {
+            self.host.clone()
+        }
     }
 }
 
@@ -29,7 +33,7 @@ impl Default for Ollama {
     fn default() -> Self {
         Self {
             host: "http://127.0.0.1".to_string(),
-            port: 11434,
+            port: Some(11434),
             reqwest_client: reqwest::Client::new(),
         }
     }
